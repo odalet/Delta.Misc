@@ -8,10 +8,8 @@ namespace TPropertyGrid
     {
         public static bool UseEnglish = true;
 
-        private static Hashtable translationsEn =
-            new Hashtable();
-        private static Hashtable translationsFr =
-            new Hashtable();
+        private static Hashtable translationsEn = new Hashtable();
+        private static Hashtable translationsFr = new Hashtable();
 
         static T()
         {
