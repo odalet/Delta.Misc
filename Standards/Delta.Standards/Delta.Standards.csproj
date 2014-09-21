@@ -48,6 +48,8 @@
       <DependentUpon>Countries.generated.t4</DependentUpon>
     </Compile>
     <Compile Include="Iso\Country.cs" />
+    <Compile Include="Iso\Currencies.cs" />
+    <Compile Include="Iso\Languages.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

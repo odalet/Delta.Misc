@@ -215,28 +215,5 @@ foreach (var country in countries.Values)
         return (builder.ToString().Normalize(NormalizationForm.FormC));
     }
  }
-
- private void Run() 
- {
- 	var dte = (DTE)((IServiceProvider)Host).GetService(typeof(DTE));		
-	var thisPath = dte.ActiveDocument.Path;
-
-	var xdoc = new XmlDocument();
-    xdoc.Load(Path.Combine(thisPath, "countries.xml"));
-
-    var root = xdoc.ChildNodes.Cast<XmlNode>().SingleOrDefault(n => n.Name == "countries");
-    if (root == null || root.ChildNodes.Count == 0)
-        return;
-
-    var countries = new List<CountryDefinition>();
-    countries.AddRange(root.ChildNodes.Cast<XmlNode>().Select(xn => new CountryDefinition()
-    {
-        Name = xn.Attributes["name"].Value,
-        Alpha2 = xn.Attributes["alpha2"].Value.ToUpperInvariant(),
-        Alpha3 = xn.Attributes["alpha3"].Value.ToUpperInvariant(),
-        Numeric = int.Parse(xn.Attributes["numeric"].Value),
-        Domain = xn.Attributes["domain"].Value.ToLowerInvariant()
-    }));
- }
 #>
 
