@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace Delta.WinHelp
 {
+    public enum WinHelpDocumentKind
+    {
+        Help,
+        Multimedia
+    }
+
     public enum WinHelpVersion
     {
         Unknown,

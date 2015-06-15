@@ -30,7 +30,9 @@ namespace Delta.WinHelp.Internals
 
     internal class BTreeIndexHeader
     {
-        // TODO
+        public ushort Unused { get; set; }
+        public short NEntries { get; set; }
+        public short PreviousPage { get; set; }
     }
 
     internal class BTreeLeafPage<T> where T : BTreeLeafEntry
@@ -41,8 +43,6 @@ namespace Delta.WinHelp.Internals
         }
 
         public BTreeNodeHeader Header { get; set; }
-        public BTreeLeafPage<T> Next { get; set; }
-        public BTreeLeafPage<T> Previous { get; set; }
         public IList<T> Entries { get; private set; }
     }
 

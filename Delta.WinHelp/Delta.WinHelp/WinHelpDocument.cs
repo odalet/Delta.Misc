@@ -14,6 +14,16 @@ namespace Delta.WinHelp
 
         public static WinHelpDocument Load(string filename)
         {
+            if (string.IsNullOrEmpty(filename))
+                throw new ArgumentException("An absolute path to the document file must be provided", "filename");
+
+            // Similarly to what is done in HELPDECO.C, we guess the kind of document based on its extension
+            return Load(filename, Path.GetExtension(filename).ToLowerInvariant().StartsWith(".m") ?
+                WinHelpDocumentKind.Multimedia : WinHelpDocumentKind.Help);
+        }
+
+        public static WinHelpDocument Load(string filename, WinHelpDocumentKind kind)
+        {
             var fname = filename;
             if (!Path.IsPathRooted(fname))
                 Path.Combine(Environment.CurrentDirectory, filename);
@@ -36,6 +46,8 @@ namespace Delta.WinHelp
 
         public string FileName { get; private set; }
 
+        public WinHelpDocumentKind Kind { get; private set; }
+
         public WinHelpInfo Info { get; private set; }
 
         internal WinHelpHeader DocumentHeader { get; private set; }
@@ -49,6 +61,8 @@ namespace Delta.WinHelp
         
         private void Parse()
         {
+            var now = DateTime.Now; // PERFS
+
             using (var stream = File.OpenRead(FileName))
             using (var reader = new BinaryReader(stream))
             {
@@ -72,12 +86,19 @@ namespace Delta.WinHelp
                 }
             }
 
+            // PERFS
+            var now2 = DateTime.Now;
+            Console.WriteLine("File was parsed in {0}", now2 - now);
+
             // TEST: retrieve all the file names & locations
             var pairs = Directory.LeafPages.SelectMany(lp => lp.Entries.Select(e => new { e.FileName, e.FileOffset }));
             foreach (var pair in pairs)
             {
                 Console.WriteLine("File {0} is @{1}", pair.FileName, pair.FileOffset);
             }
+
+            var now3 = DateTime.Now;
+            Console.WriteLine("All files displayed in {0} ({1})", now3 - now, now3 - now2);
         }
     }
 }

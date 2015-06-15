@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Delta.WinHelp.Internals;
 
 namespace Delta.WinHelp.Parsing
@@ -8,10 +9,10 @@ namespace Delta.WinHelp.Parsing
     internal class InternalDirectoryParser : BaseInternalFileParser<InternalDirectory>
     {
         public InternalDirectoryParser(BinaryReader reader) : base(reader) { }
-                
+
         protected override InternalDirectory ParseFileContent(InternalFileHeader internalFileHeader)
         {
-            var directory = new InternalDirectory();         
+            var directory = new InternalDirectory();
             directory.BTreeHeader = ParseBTreeHeader();
 
             // Store the pages Data
@@ -22,41 +23,48 @@ namespace Delta.WinHelp.Parsing
                 pageBytes.Add(page);
             }
 
-            if (directory.BTreeHeader.NLevels > 1)
-                throw new NotSupportedException("B+ Trees with more than 1 level are not supported yet!");
+            // We store all the pages in one unique list so that their index is kept consistant.
+            directory.Pages = new object[directory.BTreeHeader.TotalPages];
 
-            //for (var i = 1; i < Directory.BTreeHeader.NLevels; i++)
-            //{
-            //    // If we are here, this means NLevels > 1
-            //    var pageBytes = Directory.BTreeHeader.Pages[Directory.BTreeHeader.RootPage];
-            //}
+            if (directory.BTreeHeader.NLevels > 1)
+            {
+                var currentIndexLevel = 1;
+                var currentIPageIndex = directory.BTreeHeader.RootPage;
+                while (currentIndexLevel < directory.BTreeHeader.NLevels)
+                {
+                    var indexPageData = pageBytes[currentIPageIndex];
+
+                    using (var mstream = new MemoryStream(indexPageData))
+                    using (var mreader = new BinaryReader(mstream))
+                    {
+                        var indexPage = ProcessDirectoryIndexPage(mreader, indexPageData.Length);
+                        directory.Pages[currentIPageIndex] = (indexPage);
+                        // The following index page is @PreviousPage (unless we've reached NLevels)
+                        currentIPageIndex = indexPage.Header.PreviousPage;
+                    }
+
+                    currentIndexLevel++;
+                }
+            }
 
             // Process the leaf-pages
-            foreach (var pageData in pageBytes)
+            for (int pageIndex = 0; pageIndex < directory.Pages.Length; pageIndex++)
             {
+                if (directory.Pages[pageIndex] != null)
+                    continue; // Aready filled? This is an index page..
+                var pageData = pageBytes[pageIndex];
+
                 using (var mstream = new MemoryStream(pageData))
                 using (var mreader = new BinaryReader(mstream))
                 {
                     var leafPage = ProcessDirectoryLeafPage(mreader, pageData.Length);
-                    directory.LeafPages.Add(leafPage);
-                }
-
-                // Now set the leaf pages previous/next relations
-                foreach (var leafPage in directory.LeafPages)
-                {
-                    var nextIndex = leafPage.Header.NextPage;
-                    if (nextIndex != -1)
-                        leafPage.Next = directory.LeafPages[nextIndex];
-
-                    var prevIndex = leafPage.Header.PreviousPage;
-                    if (prevIndex != -1)
-                        leafPage.Previous = directory.LeafPages[prevIndex];
+                    directory.Pages[pageIndex] = leafPage;
                 }
             }
 
             return directory;
         }
-                
+
         protected override void Check(InternalDirectory result)
         {
             if (result.BTreeHeader.MustBeZero != (short)0)
@@ -82,7 +90,27 @@ namespace Delta.WinHelp.Parsing
 
             return header;
         }
-        
+
+        private BTreeIndexPage<DirectoryIndexEntry> ProcessDirectoryIndexPage(BinaryReader reader, int pageSize)
+        {
+            var indexPage = new BTreeIndexPage<DirectoryIndexEntry>();
+            indexPage.Header = new BTreeIndexHeader();
+            indexPage.Header.Unused = reader.ReadUInt16();
+            indexPage.Header.NEntries = reader.ReadInt16();
+            indexPage.Header.PreviousPage = reader.ReadInt16();
+
+            // Let's parse the entries
+            for (int i = 0; i < indexPage.Header.NEntries; i++)
+            {
+                var entry = new DirectoryIndexEntry();
+                entry.FileName = Helper.DecodeStringz(reader); // There is room for optimization here
+                entry.PageNumber = reader.ReadInt16();
+                indexPage.Entries.Add(entry);
+            }
+
+            return indexPage;
+        }
+
         private BTreeLeafPage<DirectoryLeafEntry> ProcessDirectoryLeafPage(BinaryReader reader, int pageSize)
         {
             var leafPage = new BTreeLeafPage<DirectoryLeafEntry>();
@@ -102,6 +130,6 @@ namespace Delta.WinHelp.Parsing
             }
 
             return leafPage;
-        }        
+        }
     }
 }
