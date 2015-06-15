@@ -12,7 +12,7 @@ namespace Delta.WinHelp.Parsing
 
         protected override InternalDirectory ParseFileContent(InternalFileHeader internalFileHeader)
         {
-            var directory = new InternalDirectory();
+            var directory = new InternalDirectory() { Header = internalFileHeader };
             directory.BTreeHeader = ParseBTreeHeader();
 
             // Store the pages Data
