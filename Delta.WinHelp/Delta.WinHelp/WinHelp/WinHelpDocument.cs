@@ -39,7 +39,7 @@ namespace Delta.WinHelp
             return document;
         }
 
-        private WinHelpDocument() 
+        private WinHelpDocument()
         {
             files = new List<WinHelpContentFile>();
         }
@@ -54,11 +54,11 @@ namespace Delta.WinHelp
 
         internal InternalDirectory Directory { get; private set; }
 
-        public IReadOnlyList<WinHelpContentFile> Files 
+        public IReadOnlyList<WinHelpContentFile> Files
         {
             get { return files; }
         }
-        
+
         private void Parse()
         {
             var now = DateTime.Now; // PERFS
@@ -67,14 +67,14 @@ namespace Delta.WinHelp
             using (var reader = new BinaryReader(stream))
             {
                 DocumentHeader = new DocumentHeaderParser(reader).Parse();
-                
+
                 // Move to @DirectoryStart & parse the internal directory
                 stream.Seek((long)DocumentHeader.DirectoryStart, SeekOrigin.Begin);
                 Directory = new InternalDirectoryParser(reader).Parse();
 
                 // Now we have all the file names and their locations. Let's fill the Files table.
                 files.AddRange(Directory.LeafPages.SelectMany(lp => lp.Entries.Select(e =>
-                    new WinHelpContentFile (this, e.FileName, e.FileOffset))));
+                    new WinHelpContentFile(this, e.FileName, e.FileOffset))));
 
                 // Decode the |SYSTEM file
                 var sys = files.SingleOrDefault(f => f.IsSystemFile);
@@ -83,6 +83,14 @@ namespace Delta.WinHelp
                     stream.Seek((long)sys.Offset, SeekOrigin.Begin);
                     var sysfile = new SystemFileParser(reader).Parse();
                     Info = new WinHelpInfo(sysfile);
+                }
+
+                // Decode the |PHRASES file
+                var phrases = files.SingleOrDefault(f => f.IsPhrasesFile);
+                if (phrases != null)
+                {
+                    stream.Seek((long)phrases.Offset, SeekOrigin.Begin);
+                    var phrasesFile = new PhrasesFileParser(reader, Info.Compression == WinHelpCompression.LZ77).Parse();
                 }
             }
 

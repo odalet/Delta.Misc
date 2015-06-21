@@ -8,6 +8,7 @@ namespace Delta.WinHelp
     public class WinHelpContentFile
     {
         private const string systemFileName = "|SYSTEM";
+        private const string phrasesFileName = "|PHRASES";
 
         private readonly WinHelpDocument parent;
         private readonly string name;
@@ -29,6 +30,11 @@ namespace Delta.WinHelp
         public bool IsSystemFile
         {
             get { return string.CompareOrdinal(name, systemFileName) == 0; }
+        }
+
+        public bool IsPhrasesFile
+        {
+            get { return string.CompareOrdinal(name, phrasesFileName) == 0; }
         }
     }
 }
