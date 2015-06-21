@@ -8,7 +8,7 @@ namespace Delta.WinHelp
     public class WinHelpContentFile
     {
         private const string systemFileName = "|SYSTEM";
-        private const string phrasesFileName = "|PHRASES";
+        private const string phrasesFileName = "|Phrases";
 
         private readonly WinHelpDocument parent;
         private readonly string name;

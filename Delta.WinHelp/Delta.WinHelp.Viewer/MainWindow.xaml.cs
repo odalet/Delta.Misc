@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -59,18 +60,26 @@ namespace Delta.WinHelp.Viewer
                 Path.Combine(here, "data", "VB5CCE", "vb5pss.hlp"),
                 Path.Combine(here, "data", "VB5CCE", "vbcmn96.hlp"),
                 Path.Combine(here, "data", "VB5CCE", "vbenlr3.hlp"),
-                Path.Combine(here, "data", "VB5CCE", "veENdf3.hlp")
+                Path.Combine(here, "data", "VB5CCE", "veENdf3.hlp"),
+
+                Path.Combine(here, "data", "Watcom", "MCISTRWH.HLP"),
+                Path.Combine(here, "data", "Watcom", "PENAPIWH.HLP"),
+                Path.Combine(here, "data", "Watcom", "SHED.HLP"),
+                Path.Combine(here, "data", "Watcom", "WIN31MWH.HLP"),
+                Path.Combine(here, "data", "Watcom", "WINHELP.HLP")
             };
 
+            var docsWithPhrases = new List<WinHelpDocument>();
             foreach (var test in tests)
             {
                 var doc = WinHelpDocument.Load(test);
                 var found = doc.Files.Where(f => f.IsPhrasesFile).ToArray();
                 if (found.Length > 0)
-                {
-                    var stop = true;
-                }
+                    docsWithPhrases.Add(doc);
             }
+
+            
+            
 
             
         }

@@ -211,6 +211,26 @@
       <Link>data\VB5CCE\veENdf3.hlp</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\samples\Watcom\MCISTRWH.HLP">
+      <Link>data\Watcom\MCISTRWH.HLP</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\samples\Watcom\PENAPIWH.HLP">
+      <Link>data\Watcom\PENAPIWH.HLP</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\samples\Watcom\SHED.HLP">
+      <Link>data\Watcom\SHED.HLP</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\samples\Watcom\WIN31MWH.HLP">
+      <Link>data\Watcom\WIN31MWH.HLP</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\samples\Watcom\WINHELP.HLP">
+      <Link>data\Watcom\WINHELP.HLP</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
