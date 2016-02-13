@@ -1,6 +1,7 @@
 ﻿using TestLib;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+// Tests
 namespace TestLib.Tests
 {
     [TestClass()]
