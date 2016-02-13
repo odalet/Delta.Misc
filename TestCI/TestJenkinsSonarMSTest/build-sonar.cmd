@@ -1,4 +1,4 @@
-pushd
+pushd %~dp0
 cd %~dp0
 
 rd /q /s "%~dp0.sonarqube"
