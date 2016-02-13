@@ -49,7 +49,7 @@ namespace Delta.WinHelp.Viewer
                 Path.Combine(here, "data", "Borland", "WORKHELP.HLP"),
 
                 Path.Combine(here, "data", "VB3", "DATAMGR.HLP"),
-                Path.Combine(here, "data", "VB3", "VB.HLP"),
+                Path.Combine(here, "data", "VB3", "VB.HLP"),                // Has Phrases and no compression
 
                 Path.Combine(here, "data", "VB5CCE", "ccreadme.hlp"),
                 Path.Combine(here, "data", "VB5CCE", "ctlcrwzd.hlp"),
@@ -70,12 +70,15 @@ namespace Delta.WinHelp.Viewer
             };
 
             var docsWithPhrases = new List<WinHelpDocument>();
-            foreach (var test in tests)
+            foreach (var test in tests.Where(f => !f.ToLowerInvariant().EndsWith(".gid")))
             {
                 var doc = WinHelpDocument.Load(test);
-                var found = doc.Files.Where(f => f.IsPhrasesFile).ToArray();
-                if (found.Length > 0)
-                    docsWithPhrases.Add(doc);
+                if (doc.Info.Compression == WinHelpCompression.None)
+                {
+                    var found = doc.Files.Where(f => f.IsPhrasesFile).ToArray();
+                    if (found.Length > 0)
+                        docsWithPhrases.Add(doc);
+                }
             }
 
             
