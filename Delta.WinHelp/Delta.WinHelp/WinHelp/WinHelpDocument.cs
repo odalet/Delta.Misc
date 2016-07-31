@@ -26,7 +26,7 @@ namespace Delta.WinHelp
         {
             var fname = filename;
             if (!Path.IsPathRooted(fname))
-                Path.Combine(Environment.CurrentDirectory, filename);
+                fname = Path.Combine(Environment.CurrentDirectory, filename);
 
             if (!File.Exists(fname))
                 throw new FileNotFoundException(string.Format("File {0} could not be found.", fname));
